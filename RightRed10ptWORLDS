@@ -1,0 +1,343 @@
+#pragma config(Sensor, dgtl2,  quadA,          sensorQuadEncoder)
+#pragma config(Sensor, dgtl4,  quadB,          sensorQuadEncoder)
+#pragma config(Motor,  port1,           LBdrive,       tmotorVex393HighSpeed_HBridge, openLoop)
+#pragma config(Motor,  port2,           Ldr4b,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port3,           Lmobgoal,      tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port4,           L4bar,         tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port5,           LFdrive,       tmotorVex393HighSpeed_MC29, openLoop)
+#pragma config(Motor,  port6,           RFdrive,       tmotorVex393HighSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port7,           intake,        tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port8,           Rmobgoal,      tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port9,           Rdr4b,         tmotorVex393HighSpeed_MC29, openLoop)
+#pragma config(Motor,  port10,          RBdrive,       tmotorVex393HighSpeed_HBridge, openLoop, reversed)
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*        Description: Competition template for VEX EDR                      */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+
+// This code is for the VEX cortex platform
+#pragma platform(VEX2)
+
+// Select Download method as "competition"
+#pragma competitionControl(Competition)
+
+//Main competition background code...do not modify!
+#include "Vex_Competition_Includes.c"
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the cortex has been powered on and    */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+void pre_auton()
+{
+  // Set bStopTasksBetweenModes to false if you want to keep user created tasks
+  // running between Autonomous and Driver controlled modes. You will need to
+  // manage all user created tasks if set to false.
+  bStopTasksBetweenModes = true;
+
+	// Set bDisplayCompetitionStatusOnLcd to false if you don't want the LCD
+	// used by the competition include file, for example, you might want
+	// to display your team name on the LCD in this function.
+	// bDisplayCompetitionStatusOnLcd = false;
+
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+//autonomous is to get a mobile goal, stack preload on goal, and drop off in 10 point zone
+//red right side (hard)
+task autonomous()
+{
+// power to intake
+	motor[intake]	= 40;
+
+	// deploying 4bar + dr4b
+	motor[L4bar] = 127;
+	motor[Rdr4b] = 127;
+	motor[Ldr4b] = 127;
+	wait1Msec(1000);
+
+	motor[Rdr4b] = 0;
+	motor[Ldr4b] = 0;
+	motor[L4bar] = 0;
+
+
+	// drive forward and deploy mobile goal lift
+	motor[LFdrive] = 127;
+	motor[RFdrive] = 127;
+	motor[RBdrive] = 127;
+	motor[LBdrive] = 127;
+
+	motor[Lmobgoal] = 127;
+	motor[Rmobgoal] = 127;
+
+	wait1Msec(1000);
+
+	//stop lowering lift
+	motor[Lmobgoal] = 0;
+	motor[Rmobgoal] = 0;
+
+	wait1Msec(600);
+
+	motor[LFdrive] = 0;
+	motor[RFdrive] = 0;
+	motor[RBdrive] = 0;
+	motor[LBdrive] = 0;
+
+	// pick up mobile goal
+	motor[Lmobgoal] = -127;
+	motor[Rmobgoal] = -127;
+	wait1Msec(1000);
+	motor[Lmobgoal] = 0;
+	motor[Rmobgoal] = 0;
+
+	// driving backwards + pivot
+	motor[LFdrive] = -75;
+	motor[RFdrive] = -127;
+	motor[LBdrive] = -75;
+	motor[RBdrive] = -127;
+
+	// lower lift to drop cone while backing up
+	motor[Rdr4b] = -127;
+	motor[Ldr4b] = -127;
+	motor[L4bar] = 127;
+
+	wait1Msec(1000);
+
+	motor[Rdr4b] = 0;
+	motor[Ldr4b] = 0;
+	motor[L4bar] = 0;
+
+	wait1Msec(500);
+
+	motor[LFdrive] = 0;
+	motor[RFdrive] = 0;
+	motor[RBdrive] = 0;
+	motor[LBdrive] = 0;
+
+	// drop cone
+	motor[intake] = -127;
+
+	wait1Msec(200);
+
+	motor[intake] = 0;
+	wait1Msec(150);
+
+	// pivot and raise lift
+	motor[LFdrive] = 100;
+	motor[RFdrive] = -100;
+	motor[LBdrive] = 100;
+	motor[RBdrive] = -100;
+
+	motor[Rdr4b] = 127;
+	motor[Ldr4b] = 127;
+
+	wait1Msec(500);
+
+	motor[Rdr4b] = 0;
+	motor[Ldr4b] = 0;
+
+	wait1Msec(500);
+
+	//wait1Msec();
+	motor[LFdrive] = 0;
+	motor[RFdrive] = 0;
+	motor[RBdrive] = 0;
+	motor[LBdrive] = 0;
+
+	// put in zone
+	motor[LFdrive] = 127;
+	motor[RFdrive] = 127;
+	motor[LBdrive] = 127;
+	motor[RBdrive] = 127;
+	wait1Msec(550);
+	motor[LFdrive] = 0;
+	motor[RFdrive] = 0;
+	motor[RBdrive] = 0;
+	motor[LBdrive] = 0;
+
+	motor[Lmobgoal] = 127;
+	motor[Rmobgoal] = 127;
+	wait1Msec(1000);
+	motor[Lmobgoal] = 0;
+	motor[Rmobgoal] = 0;
+
+	// drive back
+	motor[LFdrive] = -80;
+	motor[RFdrive] = -80;
+	motor[LBdrive] = -80;
+	motor[RBdrive] = -80;
+
+
+	motor[Rdr4b] = 127;
+	motor[Ldr4b] = 127;
+
+
+	wait1Msec(400);
+
+	motor[Rdr4b] = 0;
+	motor[Ldr4b] = 0;
+
+	motor[LFdrive] = 0;
+	motor[RFdrive] = 0;
+	motor[RBdrive] = 0;
+	motor[LBdrive] = 0;
+
+	// raise mobile goal lift
+	motor[Lmobgoal] = -127;
+	motor[Rmobgoal] = -127;
+	wait1Msec(1000);
+	motor[Lmobgoal] = 0;
+	motor[Rmobgoal] = 0;
+
+	// drive out of zone
+	//motor[LFdrive] = -80;
+	//motor[RFdrive] = -80;
+	//motor[LBdrive] = -80;
+	//motor[RBdrive] = -80;
+
+	motor[Rdr4b] = -127;
+	motor[Ldr4b] = -127;
+
+	wait1Msec(400);
+
+	//motor[LFdrive] = 0;
+	//motor[RFdrive] = 0;
+	//motor[RBdrive] = 0;
+	//motor[LBdrive] = 0;
+
+	wait1Msec(400);
+	motor[Rdr4b] = 0;
+	motor[Ldr4b] = 0;
+
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+//joystick program from JoystickControl_v4 (3-1-18)
+task usercontrol()
+{
+  // User control code here, inside the loop
+
+	int kD = 2;
+	int kAB = 2;
+
+//	int kD2 = 2;
+	float kAB2 = 0.5;
+
+	int prevErrorAB = 0;
+
+	SensorValue[quadA] = 0;
+	SensorValue[quadB] = 0;
+
+	int setpoint = 0;
+	int errorStaticA = 0;
+	int errorStaticB = 0;
+
+	while(true)
+	{
+		// DR4B
+		int errorAB = SensorValue[quadA] - SensorValue[quadB];
+		int derivativeAB = errorAB - prevErrorAB;
+		prevErrorAB = errorAB;
+
+		if(vexRT[Btn7U] == 1)
+		{
+			motor[Ldr4b] = 127 - errorAB*kAB - derivativeAB*kD;
+			motor[Rdr4b] = 127 + errorAB*kAB + derivativeAB*kD;
+			setpoint = (SensorValue[quadA] + SensorValue[quadB])/2;
+		}
+		else if(vexRT[Btn7D] == 1)
+		{
+			motor[Ldr4b] = -127 - errorAB*kAB - derivativeAB*kD;
+			motor[Rdr4b] = -127 + errorAB*kAB + derivativeAB*kD;
+			setpoint = (SensorValue[quadA] + SensorValue[quadB])/2;
+		}
+		else
+		{
+			errorStaticA = setpoint - SensorValue[quadA];
+			errorStaticB = setpoint - SensorValue[quadB];
+
+			motor[Ldr4b] = errorStaticA*kAB2;
+			motor[Rdr4b] = errorStaticB*kAB2;
+		}
+
+		//Drive Chain
+		motor[LFdrive] = vexRT[Ch3];
+	  motor[LBdrive] = vexRT[Ch3];
+		motor[RFdrive] = vexRT[Ch2];
+		motor[RBdrive] = vexRT[Ch2];
+
+		//mobile goal
+		if(vexRT[Btn8U] == 1)
+		{
+			motor[Lmobgoal] = 127;
+			motor[Rmobgoal] = 127;
+		}
+		else if (vexRT[Btn8D] == 1)
+		{
+			motor[Lmobgoal] = -127;
+			motor[Rmobgoal] = -127;
+		}
+		else
+		{
+			motor[Lmobgoal] = -20;
+			motor[Rmobgoal] = -20;
+		}
+
+		// intake
+		if (vexRT[Btn5U] == 1)
+		{
+			motor[intake] = 127;
+		}
+		else if (vexRT[Btn5D] == 1)
+		{
+			motor[intake] = -127;
+		}
+		else
+		{
+			motor[intake] = 20;
+		}
+
+		// 4bar
+		if (vexRT[Btn6U] == 1)
+		{
+			motor[L4bar] = 127;
+		}
+		else if (vexRT[Btn6D] == 1)
+		{
+			motor[L4bar] = -127;
+		}
+		else
+		{
+			motor[L4bar] = 0;
+		}
+
+	}
+}
